@@ -33,12 +33,6 @@ class Matrix:
             return _multiply(self, b)
         else:
             raise Exception('Columns of matrix A does not match rows matrix B.')
-    
-    def __rmul__(self, a):
-        if a.cols == self.rows:
-            return _multiply(a, self)
-        else:
-            raise Exception('Columns of matrix A does not match rows matrix B.')
         
     def __getitem__(self, k):
         return self.data[k]
@@ -64,18 +58,21 @@ def _multiply(a, b):
 
 if __name__ == '__main__':
     print('m1')
-    m1 = Matrix(2, 3)
+    m1 = Matrix(2, 2)
     print(m1)
 
     print('m2')
-    m2 = Matrix(3, 2)
+    m2 = Matrix(2, 1)
     print(m2)
 
     print('m1 * m2')
     print(m1 * m2)
 
-    print('m2 * m1')
-    print(m2 * m1)
+    try:
+        print('m2 * m1')
+        print(m2 * m1)
+    except Exception as e:
+        print('Error: ', e, end='\n\n')
 
     print('m1 + m1')
     print(m1 + m1)
