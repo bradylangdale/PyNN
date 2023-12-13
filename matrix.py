@@ -28,11 +28,32 @@ class Matrix:
         else:
             raise Exception('Matrixes A and B are not of the same size.')
 
+    def __sub__(self, b):
+        if self.rows == b.rows and self.cols == b.cols:
+            result = Matrix(self.rows, self.cols, rand=False)
+            
+            for i in range(self.rows):
+                for j in range(self.cols):
+                    result[i][j] = self[i][j] - b[i][j]
+            
+            return result
+        else:
+            raise Exception('Matrixes A and B are not of the same size.')
+
     def __mul__(self, b):
         if self.cols == b.rows:
             return _multiply(self, b)
         else:
             raise Exception('Columns of matrix A does not match rows matrix B.')
+
+    def __pow__(self, power):
+        result = Matrix(self.rows, self.cols, rand=False)
+        result.data = self.data
+
+        for i in range(1, power):
+            result = _multiply(result, self)
+
+        return result
         
     def __getitem__(self, k):
         return self.data[k]
@@ -76,3 +97,7 @@ if __name__ == '__main__':
 
     print('m1 + m1')
     print(m1 + m1)
+
+    print(m1)
+    print(m1**3)
+    print(m1)

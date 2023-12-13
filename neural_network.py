@@ -20,8 +20,8 @@ class NeuralNetwork:
             self.bias.append(Matrix(self.layers[i].rows, 1, rand))
             self.weights.append(Matrix(self.layers[i].rows, self.layers[i - 1].rows, rand))
 
-    def forward(self, m):
-        self.layers[0] = m
+    def forward(self, input):
+        self.layers[0] = input
 
         for i in range(1, len(self.layers)):
             self.layers[i] = self.sigmoid((self.weights[i - 1] * self.layers[i - 1]) + self.bias[i - 1])
@@ -31,6 +31,9 @@ class NeuralNetwork:
             m[i][0] = 1.0 / (1.0 + math.exp(-m[i][0]))
 
         return m
+    
+    def backward(self, output):
+        pass
 
     def size(self):
         length = []
