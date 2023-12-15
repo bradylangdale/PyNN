@@ -9,6 +9,15 @@ class Matrix:
 
         self.data = [[random.uniform(-1, 1) if rand else 0 for c in range(self.cols)] 
             for r in range(self.rows)]
+
+    def transpose(self):
+        result = Matrix(self.cols, self.rows, rand=False)
+
+        for i in range(self.rows):
+            for j in range(self.cols):
+                result[j][i] = self[i][j]
+
+        return result
         
     def __str__(self):
         s = ''
@@ -38,13 +47,36 @@ class Matrix:
             
             return result
         else:
-            raise Exception('Matrixes A and B are not of the same size.')
+            if b.rows == 1 and b.cols == 1:
+                result = Matrix(self.rows, self.cols, rand=False)
+                
+                for i in range(self.rows):
+                    for j in range(self.cols):
+                        result[i][j] = self[i][j] - b[0][0]
+                
+                return result
+            else: 
+                raise Exception('Matrixes A and B are not of the same size.')
 
     def __mul__(self, b):
-        if self.cols == b.rows:
+        if type(b) is int or type(b) is float:
+            return self.__rmul__(b)
+        elif self.cols == b.rows:
             return _multiply(self, b)
         else:
             raise Exception('Columns of matrix A does not match rows matrix B.')
+
+    def __rmul__(self, const):
+        if type(const) is int or type(const) is float:
+            result = Matrix(self.rows, self.cols, rand=False)
+            
+            for i in range(self.rows):
+                for j in range(self.cols):
+                    result[i][j] = const * self[i][j]
+            
+            return result
+        else:
+            raise Exception('Can not multiply int and matrix together.')
 
     def __pow__(self, power):
         result = Matrix(self.rows, self.cols, rand=False)
@@ -101,3 +133,5 @@ if __name__ == '__main__':
     print(m1)
     print(m1**3)
     print(m1)
+
+    print(2.0 * m1)
