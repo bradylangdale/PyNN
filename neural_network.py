@@ -32,7 +32,7 @@ class NeuralNetwork:
 
         return m
     
-    def backward(self, output, rate_weights=0.001, rate_bias=0.001):
+    def backward(self, output, rate_weights=0.5, rate_bias=0.5):
         dsig = self.dsigmoid(self.layers[-1])
         dc = 2 * (self.layers[-1] - output)
 
@@ -47,12 +47,9 @@ class NeuralNetwork:
 
         for i in range(2, len(self.layers)):
             dsig = self.dsigmoid(self.layers[-i])
-            dc = 2 * (self.layers[-i] - delta)
+            dc = 2 * (self.layers[-(i - 1)].transpose() * delta)
 
-            delta = Matrix(dsig.rows, dsig.cols, rand=False)
-            for j in range(dsig.rows):
-                delta[j][0] = dsig[j][0] * dc[j][0]
-
+            delta = dsig * dc
             dcost = delta * self.layers[-(i + 1)].transpose()
 
             self.weights[-i] -= rate_weights * dcost
@@ -81,7 +78,7 @@ if __name__ == '__main__':
     import numpy as np
 
 
-    '''nn = NeuralNetwork([784, 32, 10])
+    nn = NeuralNetwork([784, 32, 10])
     data = list(list(mnist_loader.load_data_wrapper())[0])
 
     j = 10
@@ -106,16 +103,16 @@ if __name__ == '__main__':
             print(train_set[1])
             j = 0
 
-        j += 1'''
+        j += 1
 
     # adding function example
-    nn = NeuralNetwork([2, 2, 1])   
+    '''nn = NeuralNetwork([2, 4, 4, 4, 1])   
 
     j = 1000
     for i in range(1000000):
         input = Matrix(2, 1, rand=False)
-        input[0][0] = random.uniform(0.0, 0.35)
-        input[1][0] = random.uniform(0.0, 0.35)
+        input[0][0] = random.uniform(0.0, 0.5)
+        input[1][0] = random.uniform(0.0, 0.5)
         output = Matrix(1, 1, rand=False)
         output[0][0] = input[0][0] + input[1][0]
 
@@ -127,4 +124,4 @@ if __name__ == '__main__':
             print('Delta:', abs(nn.layers[-1][0][0] - output[0][0]))
             j = 0
 
-        j += 1
+        j += 1'''
