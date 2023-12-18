@@ -8,16 +8,11 @@ class Matrix:
         self.rows = rows
         self.cols = cols
 
-        self.data = [[random.uniform(-1, 1) if rand else 0 for c in range(self.cols)] 
-            for r in range(self.rows)]
+        self.data = np.random.rand(rows, cols) if rand else np.zeros(shape=(rows, cols))
 
     def transpose(self):
         result = Matrix(self.cols, self.rows, rand=False)
-
-        for i in range(self.rows):
-            for j in range(self.cols):
-                result[j][i] = self[i][j]
-
+        result.data = self.data.transpose()
         return result
         
     def __str__(self):
@@ -29,11 +24,7 @@ class Matrix:
     def __add__(self, b):
         if self.rows == b.rows and self.cols == b.cols:
             result = Matrix(self.rows, self.cols, rand=False)
-            
-            for i in range(self.rows):
-                for j in range(self.cols):
-                    result[i][j] = self[i][j] + b[i][j]
-            
+            result.data = np.add(self.data, b.data)
             return result
         else:
             raise Exception('Matrixes A and B are not of the same size.')
@@ -41,20 +32,12 @@ class Matrix:
     def __sub__(self, b):
         if self.rows == b.rows and self.cols == b.cols:
             result = Matrix(self.rows, self.cols, rand=False)
-            
-            for i in range(self.rows):
-                for j in range(self.cols):
-                    result[i][j] = self[i][j] - b[i][j]
-            
+            result.data = np.subtract(self.data, b.data)
             return result
         else:
             if b.rows == 1 and b.cols == 1:
                 result = Matrix(self.rows, self.cols, rand=False)
-                
-                for i in range(self.rows):
-                    for j in range(self.cols):
-                        result[i][j] = self[i][j] - b[0][0]
-                
+                result.data = np.subtract(self.data, b.data)
                 return result
             else: 
                 raise Exception('Matrixes A and B are not of the same size.')
@@ -70,11 +53,7 @@ class Matrix:
     def __rmul__(self, const):
         if type(const) is int or type(const) is float:
             result = Matrix(self.rows, self.cols, rand=False)
-            
-            for i in range(self.rows):
-                for j in range(self.cols):
-                    result[i][j] = const * self[i][j]
-            
+            result.data = self.data * const
             return result
         else:
             raise Exception('Can not multiply int and matrix together.')
@@ -100,14 +79,7 @@ class Matrix:
 
 def _multiply(a, b):
     result = Matrix(a.rows, b.cols, rand=False)
-
-    for i in range(a.rows):
-        for j in range(b.cols):
-            entry = 0
-            for k in range(a.cols):
-                entry += a[i][k] * b[k][j]
-            result[i][j] = entry
-    
+    result.data = np.matmul(a.data, b.data)
     return result
 
 if __name__ == '__main__':
