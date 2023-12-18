@@ -46,28 +46,28 @@ class NeuralNetwork:
         return result
     
     def backward(self, output, rate_weights=0.5, rate_bias=0.5):
-        dsig = self.dsigmoid(self.layers[-1])
-        dc = 2 * (self.layers[-1] - output)
+        da_dz = self.dsigmoid(self.layers[-1])
+        dc_da = 2 * (self.layers[-1] - output)
 
-        delta = Matrix(dsig.rows, dsig.cols, rand=False)
-        for i in range(dsig.rows):
-            delta[i][0] = dsig[i][0] * dc[i][0]
+        delta = Matrix(da_dz.rows, da_dz.cols, rand=False)
+        for i in range(da_dz.rows):
+            delta[i][0] = da_dz[i][0] * dc_da[i][0]
 
-        dcost = delta * self.layers[-2].transpose()
+        dc_dw = delta * self.layers[-2].transpose()
 
-        gradient = [(rate_weights * dcost, rate_bias * delta)]
+        gradient = [(rate_weights * dc_dw, rate_bias * delta)]
 
         for i in range(2, len(self.layers)):
-            dsig = self.drelu(self.layers[-i])
-            dc = 2 * (self.weights[-(i - 1)].transpose() * delta)
+            da_dz = self.drelu(self.layers[-i])
+            dc_da = (self.weights[-(i - 1)].transpose() * delta)
 
-            delta = Matrix(dsig.rows, dsig.cols, rand=False)
-            for j in range(dsig.rows):
-                delta[j][0] = dsig[j][0] * dc[j][0]
+            delta = Matrix(da_dz.rows, da_dz.cols, rand=False)
+            for j in range(da_dz.rows):
+                delta[j][0] = da_dz[j][0] * dc_da[j][0]
 
-            dcost = delta * self.layers[-(i + 1)].transpose()
+            dc_dw = delta * self.layers[-(i + 1)].transpose()
 
-            gradient.append((rate_weights * dcost, rate_bias * delta))
+            gradient.append((rate_weights * dc_dw, rate_bias * delta))
 
         gradient = list(reversed(gradient))
 
@@ -76,7 +76,7 @@ class NeuralNetwork:
             self.weights[i] -= gradient[i][0]
             self.bias[i] -= gradient[i][1]
 
-        return sum(sum(x) for x in dc.data)
+        return sum(sum(x) for x in dc_da.data)
 
     def dsigmoid(self, m):
         result = Matrix(m.rows, m.cols, rand=False)
@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
 
     # adding function example
-    nn = NeuralNetwork([2, 1])   
+    nn = NeuralNetwork([2, 2, 1])   
 
     j = 1000
     for i in range(200000):

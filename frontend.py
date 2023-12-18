@@ -17,7 +17,7 @@ class UI(QWidget):
         # loading the ui file with uic module
         uic.loadUi('main.ui', self)
 
-        self.neural = QNeuralNetwork([784, 12, 10])
+        self.neural = QNeuralNetwork([784, 32, 10])
 
         # setup graphs
         self.accuracyGraph = TelemetryGraph(self.findChild(PlotWidget, 'accuracyGraph'))

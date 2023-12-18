@@ -76,7 +76,7 @@ class QNeuralNetwork(QObject):
 
             index = np.argmax(train_set[1])
             rate = 1 - self.nn.layers[-1][index][0]
-            rate = max(0.1, min(rate, 0.99)) * 0.001
+            rate = max(0.1, min(rate, 0.99)) * 0.1
             cost = self.nn.backward(output, rate, rate)
 
             if j == 10:
