@@ -55,8 +55,7 @@ class NeuralNetwork:
 
         dcost = delta * self.layers[-2].transpose()
 
-        self.weights[-1] -= rate_weights * dcost
-        self.bias[-1] -= rate_bias * delta
+        gradient = [(rate_weights * dcost, rate_bias * delta)]
 
         for i in range(2, len(self.layers)):
             dsig = self.drelu(self.layers[-i])
@@ -68,8 +67,14 @@ class NeuralNetwork:
 
             dcost = delta * self.layers[-(i + 1)].transpose()
 
-            self.weights[-i] -= rate_weights * dcost
-            self.bias[-i] -= rate_bias * delta
+            gradient.append((rate_weights * dcost, rate_bias * delta))
+
+        gradient = list(reversed(gradient))
+
+        # apply gradient
+        for i in range(len(self.weights)):
+            self.weights[i] -= gradient[i][0]
+            self.bias[i] -= gradient[i][1]
 
         return sum(sum(x) for x in dc.data)
 
@@ -101,7 +106,7 @@ if __name__ == '__main__':
 
 
     # adding function example
-    nn = NeuralNetwork([2, 4, 4, 4, 1])   
+    nn = NeuralNetwork([2, 1])   
 
     j = 1000
     for i in range(200000):

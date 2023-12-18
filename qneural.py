@@ -24,6 +24,11 @@ class QNeuralNetwork(QObject):
         self.moveToThread(self.training_thread)
         self.training_thread.started.connect(self.run)
 
+    def inference(self, m):
+        self.nn.forward(m)
+
+        return self.nn.layers[-1].transpose()[0]
+
     def start_training(self):
         self.alive = True
         self.training_thread.start()
@@ -47,8 +52,8 @@ class QNeuralNetwork(QObject):
         data = list(list(mnist_loader.load_data_wrapper())[0])
         j = 10
         i = random.randint(0, len(data))
-        right = 0
-        wrong = 0
+        right = []
+        wrong = []
         cost = 0
 
         tested = [i]
@@ -63,17 +68,20 @@ class QNeuralNetwork(QObject):
             self.nn.forward(input)
 
             if np.argmax(self.nn.layers[-1].data) == np.argmax(train_set[1]):
-                right += 1
+                right.append(1)
+                wrong.append(0)
             else:
-                wrong += 1
+                right.append(0)
+                wrong.append(1)
 
             index = np.argmax(train_set[1])
             rate = 1 - self.nn.layers[-1][index][0]
-            rate = max(0.1, min(rate, 0.99)) * 0.01
+            rate = max(0.1, min(rate, 0.99)) * 0.001
             cost = self.nn.backward(output, rate, rate)
 
             if j == 10:
-                self.trainingProgress.emit([cost, right, wrong, (right/(right + wrong)) * 100])
+                self.trainingProgress.emit([cost, sum(right), sum(wrong),
+                                            (sum(right)/(sum(right) + sum(wrong))) * 100])
                 j = 0
 
             j += 1
@@ -86,3 +94,7 @@ class QNeuralNetwork(QObject):
             if len(data) - 1 == len(tested):
                 i = random.randint(0, len(data) - 1)
                 tested = [i]
+
+            if len(right) >= 100:
+                right.pop(0)
+                wrong.pop(0)
