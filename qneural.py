@@ -1,3 +1,4 @@
+import math
 from PyQt6.QtCore import pyqtSignal, QObject, QThread
 
 from matrix import Matrix
@@ -50,11 +51,11 @@ class QNeuralNetwork(QObject):
 
     def run(self):
         data = list(list(mnist_loader.load_data_wrapper())[0])
-        j = 10
+        j = 0
         i = random.randint(0, len(data))
         right = []
         wrong = []
-        cost = 0
+        gradient = []
 
         tested = [i]
         while self.alive:
@@ -74,14 +75,21 @@ class QNeuralNetwork(QObject):
                 right.append(0)
                 wrong.append(1)
 
-            index = np.argmax(train_set[1])
-            rate = 1 - self.nn.layers[-1][index][0]
-            rate = max(0.1, min(rate, 0.99)) * 0.1
-            cost = self.nn.backward(output, rate, rate)
+            #index = np.argmax(train_set[1])
+            #accuracy += abs(1 - self.nn.layers[-1][index][0])
 
-            if j == 10:
-                self.trainingProgress.emit([cost, sum(right), sum(wrong),
+            gradient = self.nn.sum_grads(gradient, self.nn.backward(output))
+
+            if j == 50:
+                error = (sum(wrong)/(sum(right) + sum(wrong)))
+                if error == 1:
+                    error = 0.99
+
+                self.trainingProgress.emit([sum(right), sum(wrong),
                                             (sum(right)/(sum(right) + sum(wrong))) * 100])
+                
+                self.nn.optimize(gradient, j / math.sqrt(1 - error**2))
+                gradient = []
                 j = 0
 
             j += 1
@@ -95,6 +103,6 @@ class QNeuralNetwork(QObject):
                 i = random.randint(0, len(data) - 1)
                 tested = [i]
 
-            if len(right) >= 100:
+            if len(right) >= 50:
                 right.pop(0)
                 wrong.pop(0)

@@ -2,6 +2,8 @@ import random
 import numpy as np
 
 
+supported_constants = [int, float, np.float64]
+
 class Matrix:
 
     def __init__(self, rows, cols, rand=True):
@@ -43,7 +45,7 @@ class Matrix:
                 raise Exception('Matrixes A and B are not of the same size.')
 
     def __mul__(self, b):
-        if type(b) is int or type(b) is float:
+        if type(b) in supported_constants:
             return self.__rmul__(b)
         elif self.cols == b.rows:
             return _multiply(self, b)
@@ -51,12 +53,32 @@ class Matrix:
             raise Exception('Columns of matrix A does not match rows matrix B.')
 
     def __rmul__(self, const):
-        if type(const) is int or type(const) is float:
+        if type(const) in supported_constants:
             result = Matrix(self.rows, self.cols, rand=False)
             result.data = self.data * const
             return result
         else:
             raise Exception('Can not multiply int and matrix together.')
+
+    def __floordiv__(self, b):
+        if type(b) in supported_constants:
+            return self._div_(b)
+        else:
+            raise Exception('Operation not supported.')
+    
+    def __truediv__(self, b):
+        if type(b) in supported_constants:
+            return self._div_(b)
+        else:
+            raise Exception('Operation not supported.')        
+    
+    def _div_(self, const):
+        if type(const) in supported_constants:
+            result = Matrix(self.rows, self.cols, rand=False)
+            result.data = self.data / const
+            return result
+        else:
+            raise Exception('Can not divide int and matrix.')
 
     def __pow__(self, power):
         result = Matrix(self.rows, self.cols, rand=False)

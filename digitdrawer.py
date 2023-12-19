@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QWidget
 from PyQt6.QtCore import Qt, QPoint, QSize, QRect, pyqtSignal
 from PyQt6.QtGui import QPixmap, QPainter, QPen, QColor
+import numpy as np
 from matrix import Matrix
 
 
@@ -70,7 +71,7 @@ class DigitDrawer(QWidget):
         for x in range(28):
             for y in range(28):
                 v = self.image.toImage().pixelColor(y, x).getHsv()[2]
-                pixels.append([v / 255.0])
+                pixels.append(v / 255.0)
         
-        m.data = pixels
+        m.data = np.ndarray(shape=(784, 1), buffer=np.array(pixels))
         return m
