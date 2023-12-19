@@ -17,13 +17,13 @@ class UI(QWidget):
         # loading the ui file with uic module
         uic.loadUi('main.ui', self)
 
-        self.neural = QNeuralNetwork([784, 256, 128, 64, 32, 16, 10])
+        self.neural = QNeuralNetwork([784, 16, 16, 10])
 
         # setup graphs
         self.accuracyGraph = TelemetryGraph(self.findChild(PlotWidget, 'accuracyGraph'))
         self.accuracyGraph.setTitle('Accuracy')
         self.accuracyGraph.addLine()
-        self.accuracyGraph.x_limit = 100
+        self.accuracyGraph.x_limit = 10000
 
         self.neural.trainingProgress.connect(self.on_training_update)
         self.t_count = 0
