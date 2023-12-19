@@ -28,7 +28,7 @@ class NeuralNetwork:
             if i == len(self.layers) - 1:
                 self.layers[i] = self.sigmoid((self.weights[i - 1] * self.layers[i - 1]) + self.bias[i - 1])
             else:
-                self.layers[i] = self.relu((self.weights[i - 1] * self.layers[i - 1]) + self.bias[i - 1])
+                self.layers[i] = self.sigmoid((self.weights[i - 1] * self.layers[i - 1]) + self.bias[i - 1])
 
     def sigmoid(self, m):
         result = Matrix(m.rows, m.cols, rand=False)
@@ -60,7 +60,7 @@ class NeuralNetwork:
         gradient = [[percentage * dc_dw, percentage * delta]]
 
         for i in range(2, len(self.layers)):
-            da_dz = self.drelu(self.layers[-i])
+            da_dz = self.dsigmoid(self.layers[-i])
             dc_da = (self.weights[-(i - 1)].transpose() * delta)
 
             delta = Matrix(da_dz.rows, da_dz.cols, rand=False)
@@ -125,6 +125,7 @@ if __name__ == '__main__':
     error = 0
 
     j = 0
+    print('\n\n')
     for i in range(200000):
         input = Matrix(2, 1, rand=False)
         input[0][0] = random.uniform(0.0, 0.5)
@@ -140,12 +141,14 @@ if __name__ == '__main__':
         gradient = nn.sum_grads(gradient, nn.backward(output, 100))
 
         if j == 100:
+            print('\033[3A', end='')
             print('Output:', nn.layers[-1][0][0], 'Truth:', output[0][0])
             print('Delta:', abs(nn.layers[-1][0][0] - output[0][0]))
             error /= j
-            print('Error:', error, 'Accuracy:', (1 - error) * 100)
+            accuracy = 1 - error
+            print('Error:', error * 100, 'Accuracy:', accuracy * 100)
             
-            nn.optimize(gradient, 1)#j / math.sqrt(1 - error))
+            nn.optimize(gradient, 1 / math.sqrt(1 - error**4))
             gradient = []
             accuracy = 0
             j = 0

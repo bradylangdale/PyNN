@@ -52,11 +52,11 @@ class QNeuralNetwork(QObject):
     def run(self):
         data = list(list(mnist_loader.load_data_wrapper())[0])
         j = 0
-        i = 0#random.randint(0, len(data))
+        i = random.randint(0, len(data))
         right = []
         wrong = []
         gradient = []
-        batch_size = 50
+        batch_size = 25
 
         #tested = [i]
         while self.alive:
@@ -76,9 +76,6 @@ class QNeuralNetwork(QObject):
                 right.append(0)
                 wrong.append(1)
 
-            #index = np.argmax(train_set[1])
-            #accuracy += abs(1 - self.nn.layers[-1][index][0])
-
             gradient = self.nn.sum_grads(gradient, self.nn.backward(output, batch_size))
 
             if j == batch_size:
@@ -95,16 +92,7 @@ class QNeuralNetwork(QObject):
 
             j += 1
 
-            i += 1 #random.randint(0, len(data) - 1)
-            #while i in tested:
-            #    i = random.randint(0, len(data) - 1)
-            #tested.append(i)
-
-            #if len(data) - 1 == len(tested):
-            #    i = random.randint(0, len(data) - 1)
-            #    tested = [i]
-            if i == len(data):
-                i = 0
+            i = random.randint(0, len(data) - 1)
 
             if len(right) >= 200:
                 right.pop(0)
