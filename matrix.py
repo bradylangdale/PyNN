@@ -10,7 +10,7 @@ class Matrix:
         self.rows = rows
         self.cols = cols
 
-        self.data = np.random.rand(rows, cols) if rand else np.zeros(shape=(rows, cols))
+        self.data = (2 * (np.random.rand(rows, cols) - 0.5)) if rand else np.zeros(shape=(rows, cols))
 
     def transpose(self):
         result = Matrix(self.cols, self.rows, rand=False)

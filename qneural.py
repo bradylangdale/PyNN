@@ -52,19 +52,20 @@ class QNeuralNetwork(QObject):
     def run(self):
         data = list(list(mnist_loader.load_data_wrapper())[0])
         j = 0
-        i = random.randint(0, len(data))
+        i = 0#random.randint(0, len(data))
         right = []
         wrong = []
         gradient = []
+        batch_size = 50
 
-        tested = [i]
+        #tested = [i]
         while self.alive:
             train_set = list(data[i])
             input = Matrix(784, 1, rand=False)
-            input.data = train_set[0]
+            input.data = np.array(train_set[0])
 
             output = Matrix(10, 1, rand=False)
-            output.data = train_set[1]
+            output.data = np.array(train_set[1])
 
             self.nn.forward(input)
 
@@ -78,31 +79,33 @@ class QNeuralNetwork(QObject):
             #index = np.argmax(train_set[1])
             #accuracy += abs(1 - self.nn.layers[-1][index][0])
 
-            gradient = self.nn.sum_grads(gradient, self.nn.backward(output))
+            gradient = self.nn.sum_grads(gradient, self.nn.backward(output, batch_size))
 
-            if j == 50:
-                error = (sum(wrong)/(sum(right) + sum(wrong)))
-                if error == 1:
-                    error = 0.99
+            if j == batch_size:
+                accuracy = (sum(right)/(sum(right) + sum(wrong)))
+                if accuracy == 1:
+                    accuracy = 0.99
 
                 self.trainingProgress.emit([sum(right), sum(wrong),
                                             (sum(right)/(sum(right) + sum(wrong))) * 100])
                 
-                self.nn.optimize(gradient, j / math.sqrt(1 - error**2))
+                self.nn.optimize(gradient, 1 / math.sqrt(1 - accuracy**2))
                 gradient = []
                 j = 0
 
             j += 1
 
-            i = random.randint(0, len(data) - 1)
-            while i in tested:
-                i = random.randint(0, len(data) - 1)
-            tested.append(i)
+            i += 1 #random.randint(0, len(data) - 1)
+            #while i in tested:
+            #    i = random.randint(0, len(data) - 1)
+            #tested.append(i)
 
-            if len(data) - 1 == len(tested):
-                i = random.randint(0, len(data) - 1)
-                tested = [i]
+            #if len(data) - 1 == len(tested):
+            #    i = random.randint(0, len(data) - 1)
+            #    tested = [i]
+            if i == len(data):
+                i = 0
 
-            if len(right) >= 50:
+            if len(right) >= 200:
                 right.pop(0)
                 wrong.pop(0)

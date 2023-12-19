@@ -46,7 +46,8 @@ class NeuralNetwork:
 
         return result
     
-    def backward(self, output):
+    def backward(self, output, batch_size):
+        percentage = 1.0 / batch_size
         da_dz = self.dsigmoid(self.layers[-1])
         dc_da = 2 * (self.layers[-1] - output)
 
@@ -56,7 +57,7 @@ class NeuralNetwork:
 
         dc_dw = delta * self.layers[-2].transpose()
 
-        gradient = [[dc_dw, delta]]
+        gradient = [[percentage * dc_dw, percentage * delta]]
 
         for i in range(2, len(self.layers)):
             da_dz = self.drelu(self.layers[-i])
@@ -68,7 +69,7 @@ class NeuralNetwork:
 
             dc_dw = delta * self.layers[-(i + 1)].transpose()
 
-            gradient.append([dc_dw, delta])
+            gradient.append([percentage * dc_dw, percentage * delta])
 
         gradient = list(reversed(gradient))
 
@@ -119,7 +120,7 @@ if __name__ == '__main__':
 
 
     # adding function example
-    nn = NeuralNetwork([2, 2, 1])   
+    nn = NeuralNetwork([2, 3, 1])   
     gradient = []
     error = 0
 
@@ -136,15 +137,15 @@ if __name__ == '__main__':
 
         error += abs(output[0][0] - nn.layers[-1][0][0])
 
-        gradient = nn.sum_grads(gradient, nn.backward(output))
+        gradient = nn.sum_grads(gradient, nn.backward(output, 100))
 
-        if j == 50:
+        if j == 100:
             print('Output:', nn.layers[-1][0][0], 'Truth:', output[0][0])
             print('Delta:', abs(nn.layers[-1][0][0] - output[0][0]))
             error /= j
             print('Error:', error, 'Accuracy:', (1 - error) * 100)
             
-            nn.optimize(gradient, j / math.sqrt(1 - error**2))
+            nn.optimize(gradient, 1)#j / math.sqrt(1 - error))
             gradient = []
             accuracy = 0
             j = 0

@@ -14,7 +14,7 @@ class DigitDrawer(QWidget):
 
         self.modified = False
         self.drawing = False
-        self.myPenWidth = 1
+        self.myPenWidth = 2
         self.myPenColor = QColor.fromRgb(255, 255, 255)
         self.image = QPixmap(QSize(28, 28))
         self.lastPoint = QPoint()
@@ -71,7 +71,7 @@ class DigitDrawer(QWidget):
         for x in range(28):
             for y in range(28):
                 v = self.image.toImage().pixelColor(y, x).getHsv()[2]
-                pixels.append(v / 255.0)
+                pixels.append([v / 255.0])
         
-        m.data = np.ndarray(shape=(784, 1), buffer=np.array(pixels))
+        m.data = np.array(pixels)
         return m
